@@ -108,7 +108,10 @@ static uint8_t blacklistFreqsIdx;
 #endif
 
 const char *bwOptions[] = {"  25k", "12.5k", "6.25k"};
+
+// 0-FM 1-AM 2-USB
 const uint8_t modulationTypeTuneSteps[] = {100, 50, 10};
+
 const uint8_t modTypeReg47Values[] = {1, 7, 5};
 
 SpectrumSettings settings = {.stepsCount = STEPS_64,
@@ -282,6 +285,7 @@ void LockAGC() {
     lockAGC = true;
 }
 
+#ifdef ENABLE_DOPPLER
 static void SetRegMenuValue(uint8_t st, bool add) {
     uint16_t v = GetRegMenuValue(st);
     RegisterSpec s = registerSpecs[st];
@@ -300,7 +304,7 @@ static void SetRegMenuValue(uint8_t st, bool add) {
     BK4819_WriteRegister(s.num, reg | (v << s.offset));
     redrawScreen = true;
 }
-
+#endif
 
 // Utility functions
 
@@ -625,6 +629,7 @@ static void UpdateCurrentFreq(bool inc) {
     redrawScreen = true;
 }
 
+#ifdef ENABLE_DOPPLER
 static void UpdateCurrentFreqStill(bool inc) {
     uint8_t offset = modulationTypeTuneSteps[settings.modulationType];
     uint32_t f = fMeasure;
@@ -636,6 +641,7 @@ static void UpdateCurrentFreqStill(bool inc) {
     SetF(f);
     redrawScreen = true;
 }
+#endif
 
 static void UpdateFreqChangeStep(bool inc) {
     uint16_t diff = GetScanStep() * 4;
@@ -1103,6 +1109,7 @@ static void OnKeyDownFreqInput(uint8_t key) {
     }
 }
 
+#ifdef ENABLE_DOPPLER
 void OnKeyDownStill(KEY_Code_t key) {
     switch (key) {
         case KEY_3:
@@ -1209,12 +1216,14 @@ void OnKeyDownStill(KEY_Code_t key) {
             break;
     }
 }
+#endif
 
  void RenderFreqInput() {
     UI_PrintStringSmall(freqInputString, 2, 127, 0);
 //    show_uint32(tempFreq,3);
 }
 
+#ifdef ENABLE_DOPPLER
 static void UpdateStill() {
     if (TX_ON)return;
     Measure();
@@ -1226,6 +1235,7 @@ static void UpdateStill() {
 
     ToggleRX((IsPeakOverLevel() || monitorMode));
 }
+#endif
 
 static void RenderStatus() {
 
@@ -1284,6 +1294,7 @@ static void Draw_DOPPLER_Process(uint8_t DATA_LINE) {
 
 #endif
 
+#ifdef ENABLE_DOPPLER
 static void RenderStill() {
     DrawF(fMeasure);//绘制频率
     uint8_t METER_PAD_LEFT = 3;
@@ -1382,6 +1393,7 @@ static void RenderStill() {
     }
 #endif
 }
+#endif
 
 static void Render() {
     UI_DisplayClear();
@@ -1392,10 +1404,11 @@ static void Render() {
         case FREQ_INPUT:
             RenderFreqInput();
             break;
+#ifdef ENABLE_DOPPLER
         case STILL:
             RenderStill();
             break;
-
+#endif
     }
     ST7565_BlitFullScreen();
 }
@@ -1432,10 +1445,11 @@ static void HandleUserInput() {
             case FREQ_INPUT:
                 OnKeyDownFreqInput(kbd.current);
                 break;
+#ifdef ENABLE_DOPPLER
             case STILL:
                 OnKeyDownStill(kbd.current);
                 break;
-
+#endif
         }
     }
 
@@ -1475,6 +1489,7 @@ static void UpdateScan() {
     preventKeypress = false;
 
     UpdatePeakInfo();
+    // 如果信号强度超过设置的 RSSI Trigger Level，则打开接收，输出声音
     if (IsPeakOverLevel()) {
         ToggleRX(true);
         TuneToPeak();
