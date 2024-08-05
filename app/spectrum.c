@@ -1573,10 +1573,12 @@ static void Tick() {
     } else {
         if (currentState == SPECTRUM) {
             UpdateScan();
-        } else if (currentState == STILL) {
+        }
+#ifdef ENABLE_DOPPLER 
+        else if (currentState == STILL) {
             UpdateStill();
         }
-
+#endif
 
     }
 
