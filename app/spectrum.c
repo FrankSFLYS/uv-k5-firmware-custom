@@ -932,7 +932,7 @@ static void DrawRssiTriggerLevel() {
         return;
     uint8_t y = Rssi2Y(settings.rssiTriggerLevel);
     for (uint8_t x = 0; x < 128; x += 2) {
-        PutPixel(x, y, true);
+        PutPixel(x, y, false);
     }
 }
 
