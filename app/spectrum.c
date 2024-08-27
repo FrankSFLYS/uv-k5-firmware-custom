@@ -814,7 +814,7 @@ static void DrawSpectrum() {
         uint16_t rssi = rssiHistory[x >> settings.stepsCount];
         if (rssi != RSSI_MAX_VALUE) {
             //DrawVLine(Rssi2Y(rssi), DrawingEndY, x, false);
-            PutPixel(x, Rssi2Y(rssi), false);
+            PutPixel(x, Rssi2Y(rssi), true);
         }
     }
 }
