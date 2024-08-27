@@ -969,7 +969,7 @@ static void DrawTicks() {
     }
 }
 
-static void DrawArrow(uint8_t x) {
+static void DrawTriangle(uint8_t x) {
     for (signed i = -2; i <= 2; ++i) {
         signed v = x + i;
         if (!(v & 128)) {
@@ -979,6 +979,18 @@ static void DrawArrow(uint8_t x) {
             //    MMMMM            0b01111000 & 0b01111000 = 0b01111000
             //    MMMMM            0b11110000 & 0b01111000 = 0b01110000
             //                     0b11100000 & 0b01111000 = 0b01100000
+        }
+    }
+}
+
+static void DrawArrow(uint8_t x) {
+    //        M
+    //       M M
+    //      M   M    
+    for (signed i = -2; i <= 2; ++i) {
+        signed v = x + i;
+        if (!(v & 128)) {
+            gFrameBuffer[5][v] |= (0b00010000 << my_abs(i));
         }
     }
 }
