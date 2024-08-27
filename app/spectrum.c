@@ -813,7 +813,8 @@ static void DrawSpectrum() {
     for (uint8_t x = 0; x < 128; ++x) {
         uint16_t rssi = rssiHistory[x >> settings.stepsCount];
         if (rssi != RSSI_MAX_VALUE) {
-            DrawVLine(Rssi2Y(rssi), DrawingEndY, x, true);
+            //DrawVLine(Rssi2Y(rssi), DrawingEndY, x, false);
+            PutPixel(x, Rssi2Y(rssi), false);
         }
     }
 }
@@ -867,15 +868,17 @@ static void DrawStatus() {
         GUI_DisplaySmallest(String, 42 + 53 - (settings.listenBw == 0 ? 8 : 0), 1, true, true);
     } else {
 #endif
+    // 在状态栏显示 最小幅度/最大幅度
     GUI_DisplaySmallest(String, 0, 1, true, true);
 #ifdef ENABLE_DOPPLER
     }
 #endif
-
+    // 绘制电量
     DrawPower();
 
 }
 
+// 显示频率
 static void DrawF(uint32_t f) {
 #ifdef ENABLE_DOPPLER
     if (DOPPLER_MODE) {
@@ -902,6 +905,7 @@ static void DrawF(uint32_t f) {
 
 static void DrawNums() {
 
+    // 绘制左上的文字
     if (currentState == SPECTRUM) {
         sprintf(String, "%ux", GetStepsCount());
         GUI_DisplaySmallest(String, 0, 1, false, true);
@@ -915,6 +919,7 @@ static void DrawNums() {
                 settings.frequencyChangeStep % 100);
         GUI_DisplaySmallest(String, 36, 49, false, true);
     } else {
+        // 绘制下方左中右的频率显示
         sprintf(String, "%u.%05u", GetFStart() / 100000, GetFStart() % 100000);
         GUI_DisplaySmallest(String, 0, 49, false, true);
 
@@ -927,12 +932,13 @@ static void DrawNums() {
     }
 }
 
+// 绘制音频解调触发横线
 static void DrawRssiTriggerLevel() {
     if (settings.rssiTriggerLevel == RSSI_MAX_VALUE || monitorMode)
         return;
     uint8_t y = Rssi2Y(settings.rssiTriggerLevel);
     for (uint8_t x = 0; x < 128; x += 2) {
-        PutPixel(x, y, false);
+        PutPixel(x, y, true);
     }
 }
 
@@ -968,6 +974,11 @@ static void DrawArrow(uint8_t x) {
         signed v = x + i;
         if (!(v & 128)) {
             gFrameBuffer[5][v] |= (0b01111000 << my_abs(i)) & 0b01111000;
+            //      M              0b11100000 & 0b01111000 = 0b01100000
+            //     MMM             0b11110000 & 0b01111000 = 0b01110000
+            //    MMMMM            0b01111000 & 0b01111000 = 0b01111000
+            //    MMMMM            0b11110000 & 0b01111000 = 0b01110000
+            //                     0b11100000 & 0b01111000 = 0b01100000
         }
     }
 }

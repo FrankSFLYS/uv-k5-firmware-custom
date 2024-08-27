@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.cjson": "jsonc",
+        "*.wxss": "css",
+        "*.wxs": "javascript",
+        "st7565.h": "c"
+    }
+}
