@@ -9,6 +9,8 @@ ENABLE_SWD                    ?= 1
 ENABLE_OVERLAY                ?= 0
 ENABLE_LTO                    ?= 1
 
+ENABLE_ANY_TX                 ?= 1
+
 # ---- STOCK QUANSHENG FERATURES ----
 ENABLE_UART                   ?= 1
 ENABLE_AIRCOPY                ?= 0

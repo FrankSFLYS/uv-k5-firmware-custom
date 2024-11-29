@@ -949,7 +949,11 @@ void RADIO_PrepareTX(void) {
 #endif
             ) {
         // TX frequency not allowed
+#if defined(ENABLE_ANY_TX)
+        State = VFO_STATE_NORMAL;
+#else
         State = VFO_STATE_TX_DISABLE;
+#endif
     } else if (SerialConfigInProgress()) {
         // TX is disabled or config upload/download in progress
         State = VFO_STATE_TX_DISABLE;
